@@ -1,2 +1,2 @@
 # se_core
-Search Engine was implemented by Python
+Search Engine Core was implemented by Python
