@@ -14,6 +14,7 @@ import tornado.httpclient
 module_path = path.abspath(path.join(path.dirname(__file__), '../core'))
 sys.path.append(module_path)
 from core import Indexer, Searcher
+from core import BM25Scorer, PL2Scorer
 
 class IndexHandler(tornado.web.RequestHandler):
 
@@ -29,11 +30,13 @@ class SearchHandler(tornado.web.RequestHandler):
     def get(self):
         try:
             query = self.get_query_argument('q')
+            mode = self.get_query_argument('mode', default='bm25').lower()
         except Exception as e:
             logging.error(str(e))
             self.write({'results': []})
             return
-        results = searcher.search(query)
+        scorer = PL2Scorer() if mode == 'pl2' else BM25Scorer()
+        results = searcher.search(query, scorer)
         response = {
             'results': [{'doc_id': doc_id, 'score': score} for doc_id, score in results]
         }
